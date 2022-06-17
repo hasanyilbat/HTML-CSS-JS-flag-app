@@ -52,7 +52,8 @@ const renderCountry = (country) => {
   </ul>
 </div>`;
 };
-
+let name;
+let stringNames;
 const countriesDiv = document.querySelector(".countries");
 const input = document.querySelector(".input");
 const countryArray = [];
@@ -64,14 +65,47 @@ const getCountryName = async () => {
     countryArray.push(
       `<option value="${obj.name.common}">${obj.name.common}</option>`
     );
-
-    console.log(countriesDiv.value);
+    // name = dataForInput[0].name.common;
+    stringNames = countryArray.join("");
   });
+  let countryName;
 
-  const stringNames = countryArray.join("");
-  input.innerHTML = `<select class="form-select" aria-label="Default select example">
+  countriesDiv.innerHTML = `<select class="form-select" aria-label="Default select example">
  ${stringNames}
 </select>`;
+  const select = document.querySelector("select");
+  select.addEventListener("change", async () => {
+    countryName = select.value;
+    const url2 = `https://restcountries.com/v3.1/name/${countryName}`;
+    const res2 = await fetch(url2);
+    const data = await res2.json();
+    const {
+      name: { common },
+      region,
+      capital,
+      languages,
+      flags: { svg },
+      currencies,
+    } = data[0];
+    console.log(name);
+    console.log(region);
+    console.log(svg);
+    countriesDiv.innerHTML = `<div class="card" style="width: 18rem;">
+    <img class="card-img-top" src="${svg}" alt="Card image cap">
+    <div class="card-body">
+      <h5 class="card-title">${common}</h5>
+      <p class="card-text">${region}</div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item"> <i class="fas fa-lg fa-landmark"></i> ${capital}</li>
+       <li class="list-group-item"> <i class="fas fa-lg fa-comments"></i> ${Object.values(
+         languages
+       )}</li>
+         <li class="list-group-item"> <i class="fas fa-lg fa-money-bill-wave"></i> ${
+           Object.values(currencies)[0].name
+         }, ${Object.values(currencies)[0].symbol} </li>
+    </ul>
+  </div>`;
+  });
 };
 
 getCountryName();
